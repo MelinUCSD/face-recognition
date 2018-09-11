@@ -4,8 +4,13 @@ import os
 from PIL import Image
 import cv2
 import numpy as np
+import time
 import pickle
 
+#Creating a stopwatch
+start_time = time.time()
+print("\n\n##########################################################\n\nYou are now training your data set")
+print(".\n.\n.\n.\nTraining in progress... Be patient!")
 #Main/Root directory
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__)) #__file__ current file
 data_dir = os.path.join(PROJECT_ROOT, "images")
@@ -58,14 +63,17 @@ for dirName, subdirList, fileList in os.walk(data_dir):
 
 
 #Using pickle to convert a python object into string.
+print(".\n.\n.\n.\nCreating Pickle File...")
 pickle_out = open("training/ids.pickle","wb")
 pickle.dump(userInfo,pickle_out)
 pickle_out.close()
 
 #Train
 #Creating Recognizer
+print(".\n.\n.\n.\nApplying Recognizer... Almost Done!")
 recognition = cv2.face.LBPHFaceRecognizer_create()
-'''We are working with LBPH, because we won't need to worry about the brightness. It works with the idividual pixels '''
 #print(len(train_photos), len(np.array(labels)))
 recognition.train(train_photos, np.array(labels))
 recognition.save("training/trained.yml")
+print(".\n.\n.\n.\nDone!\n\n")
+print("The training took %s seconds" % (time.time()-start_time))

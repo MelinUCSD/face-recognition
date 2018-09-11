@@ -1,6 +1,6 @@
 ##########################################################################################################
 ##                                                                                                      ##
-##            Welcome to (*INSERT GOOD NAME HERE*)! Created by Dare Hunt and Matias Lin                 ##
+##                       Welcome to Spis'Face! Created by Dare Hunt and Matias Lin                      ##
 ##                                                                                                      ##
 ##########################################################################################################
 ##                                                                                                      ##
@@ -22,6 +22,7 @@ import os
 import shutil
 import os.path
 from os import path
+import time
 
 webCam = cv2.VideoCapture(0)
 faces_cascade = cv2.CascadeClassifier('cascades\data\haarcascade_frontalface_default.xml')
@@ -45,6 +46,26 @@ user = pickle.load(pickle_in)
 userInfo = dictinvers(user)
 #print(dictinvers(user))
 
+#Displaying Logo
+cap = cv2.VideoCapture('logo.mp4')
+while(cap.isOpened()):
+    ret, frame = cap.read()
+    if ret == False:
+        #print("Logo animation is missing")
+        break
+    cv2.imshow("Spis'Face", frame)
+    cv2.waitKey(10)
+time.sleep(1)
+
+#"Main Menu"
+print("\n##########################################################################################################")
+print("##                                                                                                      ##")
+print("##                       Welcome to Spis'Face! Created by Dare Hunt and Matias Lin                      ##")
+print("##                                                                                                      ##")
+print("##########################################################################################################\n")
+print("\nIn order to close the program, just press '`'\n\n\n")
+
+
 while(True):
     #Activate webCam
     ret, scope = webCam.read()
@@ -57,7 +78,7 @@ while(True):
     
     #Face Identifier
     faceId = faces_cascade.detectMultiScale(gray_scale, scaleFactor=1.5, minNeighbors = 6)
-
+        
     #Square and Label around the face
     for (x, y, w, h) in faceId:
         #print(x,y,h,w) #Checking if haarcascade is working
@@ -78,42 +99,47 @@ while(True):
 
         #Setting up the recognizer 
         myId, conf = recognition.predict(roi_gray)
-        if conf >=4 and conf <= 85:
+        #print(conf)
+        if conf >=60 and conf <= 90:
             #print(myId)
             myName = str(userInfo[myId])
-            print(myName)
-            cv2.putText(scope, myName, (x,y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (255,255,255), 3)
+            #print(myName)
+            cv2.putText(scope, myName, (x,y), cv2.FONT_HERSHEY_COMPLEX_SMALL, 2, (255,255,255), 2)
             display = "last_user_display.jpg"
             cv2.imwrite(display,scope)
 
-    cv2.imshow('scope', scope)
+    cv2.imshow("Spis'Face", scope)
     #Escape Key
     if cv2.waitKey(20) & 0xFF == ord('`'):
         last_user = Image.open("last_user_display.jpg")
         last_user.show()
+
         print("\n\n\n\n#########################################################################################################\n\n")
-        print("Thank you for using ... ! Please take a moment to complete the following survey.\n\n")
+        print("Thank you for using Spis'Face! Please take a moment to complete the following survey.\n\n")
         right_wrong = input("Was the prediction correct? ").lower()
         if right_wrong == ("yes") or right_wrong == ('y'):
             print("\n\n\n\n\n\nGreat! Please come back!\n\n")
             print("\n\n\n\n#########################################################################################################\n\n")
+            #Hiding "save_image"
+            #location = "last_user"
+            #p = os.popen('attrib +h' + location)
+            #t = p.read()
+            #p.close()
             break
         elif right_wrong == ('no') or right_wrong  == ("n"):
             print("I'm sorry to hear that. It will be of great help if you answer the next question!")
             name = input("What's your name? ")
             destination = ("images/%s" %name)
-            #newImage = os.rename(save_image, name + ".jpg") #FIND HOW TO RENAME BUT MAKE IT A JPG
-            #print(path.isdir(destination))
             if path.isdir(destination) == True:
                 shutil.move(save_image,destination)
             else:
-                os.mkdir("images/%s"%name)
+                os.mkdir("images/%s"%name) 
                 shutil.move(save_image, destination)
             print("\n\n\n\nThank you very much!\n\n")
             print("\n\n\n\n#########################################################################################################\n\n")
             break
         else:
-            print("No comprendo")
+            print("No entiendo... Shutting Down")
             break
 
 #This will free the Camera for future2 uses
